@@ -1,5 +1,9 @@
 import mongoose, { Schema, models } from 'mongoose';
 
+if (models.Post) {
+  delete models.Post;
+}
+
 const PostSchema = new Schema({
   title: {
     type: String,
@@ -9,6 +13,11 @@ const PostSchema = new Schema({
     type: String,
     required: true,
     unique: true,
+  },
+  excerpt: {
+    type: String,
+    default: '',
+    trim: true,
   },
   content: {
     type: String,
@@ -22,7 +31,7 @@ const PostSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-  },
+  }, 
   likes: [{
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -35,6 +44,6 @@ const PostSchema = new Schema({
   timestamps: true,
 });
 
-const Post = models.Post || mongoose.model('Post', PostSchema);
+const Post = mongoose.model('Post', PostSchema);
 
 export default Post;

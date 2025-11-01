@@ -1,119 +1,230 @@
-'use client';
-
-import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import connectDB from '@/lib/mongodb';
+import Post from '@/models/Post';
 
-export default function HomePage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+async function getPosts() {
+  await connectDB();
+  const posts = await Post.find()
+    .populate('author', 'name image')
+    .sort({ createdAt: -1 })
+    .limit(12)
+    .lean();
+  
+  return JSON.parse(JSON.stringify(posts));
+}
 
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+export default async function HomePage() {
+  const session = await getServerSession(authOptions);
+  const posts = await getPosts();
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
-      {/* Navbar */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-indigo-600">MyApp</h1>
-            </div>
-            
-            <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-b from-purple-500/10 via-transparent to-transparent"></div>
+        <div className="max-w-6xl mx-auto px-4 py-20 relative">
+          <div className="text-center max-w-3xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-bold bg-linear-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-6">
+              Welcome to SCRYBE!  
+            </h1>
+            <p className="text-xl text-slate-400 mb-8">
+              Discover amazing stories, tutorials, and insights from our community of writers ✨
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
               {session ? (
                 <>
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src={session.user.image} 
-                      alt={session.user.name}
-                      className="h-8 w-8 rounded-full"
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      {session.user.name}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => signOut({ callbackUrl: '/login' })}
-                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-200"
+                  <Link
+                    href="/dashboard/new"
+                    className="px-8 py-3 bg-linear-to-r from-purple-500 to-blue-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-200 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5 flex items-center gap-2"
                   >
-                    Logout
-                  </button>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Create New Post</span>
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="px-8 py-3 bg-slate-800/50 backdrop-blur-sm text-slate-300 rounded-lg font-semibold hover:bg-slate-700 transition-all duration-200 border border-slate-700/50"
+                  >
+                    My Dashboard
+                  </Link>
                 </>
               ) : (
                 <>
-                  <Link 
-                    href="/login"
-                    className="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition duration-200"
-                  >
-                    Login
-                  </Link>
-                  <Link 
+                  <Link
                     href="/register"
-                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-200"
+                    className="px-8 py-3 bg-linear-to-r from-purple-500 to-blue-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-200 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5 flex items-center gap-2"
                   >
-                    Sign Up
+                    <span>Start Writing</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Link>
+                  <Link
+                    href="#posts"
+                    className="px-8 py-3 bg-slate-800/50 backdrop-blur-sm text-slate-300 rounded-lg font-semibold hover:bg-slate-700 transition-all duration-200 border border-slate-700/50"
+                  >
+                    Explore Posts
                   </Link>
                 </>
               )}
             </div>
           </div>
         </div>
-      </nav>
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to MyApp
-          </h1>
-          
-          {session ? (
-            <div className="mt-8 bg-white rounded-lg shadow-md p-8 max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                🎉 You're logged in!
-              </h2>
-              <div className="text-left space-y-3">
-                <p className="text-gray-700">
-                  <span className="font-semibold">Name:</span> {session.user.name}
-                </p>
-                <p className="text-gray-700">
-                  <span className="font-semibold">Email:</span> {session.user.email}
-                </p>
-                <p className="text-gray-700">
-                  <span className="font-semibold">User ID:</span> {session.user.id}
-                </p>
-              </div>
+      {/* Stats Section */}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Posts Section */}
+        <div id="posts" className="mb-12">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-2">Latest Posts</h2>
+              <p className="text-slate-400">Fresh content from our community</p>
             </div>
-          ) : (
-            <div className="mt-8">
-              <p className="text-lg text-gray-600 mb-6">
-                Please login or create an account to continue
+          </div>
+
+          {posts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="w-24 h-24 bg-slate-800/50 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-300 mb-2">No posts yet</h3>
+              <p className="text-slate-500 mb-6 text-center max-w-md">
+                Be the first to share your story with the world!
               </p>
-              <div className="flex gap-4 justify-center">
+              {session ? (
                 <Link
-                  href="/login"
-                  className="px-6 py-3 text-lg font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-200"
+                  href="/dashboard/new"
+                  className="px-6 py-3 bg-linear-to-r from-purple-500 to-blue-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-200 shadow-lg shadow-purple-500/20 flex items-center gap-2"
                 >
-                  Login
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Create Your First Post
                 </Link>
+              ) : (
                 <Link
                   href="/register"
-                  className="px-6 py-3 text-lg font-medium text-indigo-600 bg-white border-2 border-indigo-600 rounded-lg hover:bg-indigo-50 transition duration-200"
+                  className="px-6 py-3 bg-linear-to-r from-purple-500 to-blue-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-200 shadow-lg shadow-purple-500/20 flex items-center gap-2"
                 >
-                  Sign Up
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Sign Up to Write
                 </Link>
-              </div>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {posts.map((post: any) => (
+                <Link
+                  key={post._id}
+                  href={`/blog/${post.slug}`}
+                  className="group bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 overflow-hidden hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1"
+                >
+                  {/* Cover Image */}
+                  {post.coverImage ? (
+                    <div className="relative h-48 overflow-hidden bg-slate-900">
+                      <img 
+                        src={post.coverImage} 
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                    </div>
+                  ) : (
+                    <div className="relative h-48 bg-linear-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                      <svg className="w-16 h-16 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* Content */}
+                  <div className="p-5">
+                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-purple-400 transition-colors">
+                      {post.title}
+                    </h3>
+                    
+                    {post.excerpt && (
+                      <p className="text-slate-400 text-sm mb-4 line-clamp-3">
+                        {post.excerpt}
+                      </p>
+                    )}
+
+                    {/* Author & Date */}
+                    <div className="flex items-center gap-3 pt-4 border-t border-slate-700/50">
+                      <img 
+                        src={post.author.image || '/default-avatar.jpg'} 
+                        alt={post.author.name}
+                        className="w-8 h-8 rounded-full ring-2 ring-purple-500/30"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-300 truncate">
+                          {post.author.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {new Date(post.createdAt).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                          })}
+                        </p>
+                      </div>
+                      {post.views !== undefined && (
+                        <div className="flex items-center gap-1 text-xs text-slate-500">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          <span>{post.views || 0}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Read More */}
+                    <div className="mt-4 flex items-center gap-2 text-purple-400 group-hover:text-purple-300 transition-colors text-sm font-medium">
+                      <span>Read more</span>
+                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           )}
         </div>
-      </main>
+
+        {/* CTA Section */}
+        {!session && (
+          <div className="bg-linear-to-r from-purple-500/10 via-blue-500/10 to-purple-500/10 rounded-2xl p-12 text-center border border-purple-500/20">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Ready to Share Your Story?
+            </h2>
+            <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
+              Join our community of writers and start publishing your ideas today. It's free and takes less than a minute!
+            </p>
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-purple-500 to-blue-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-200 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5"
+            >
+              <span>Get Started Now</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+        
     </div>
   );
 }
