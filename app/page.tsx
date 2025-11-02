@@ -1,8 +1,23 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
+
+interface PostType {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  coverImage?: string;
+  createdAt: string;
+  views?: number;
+  author: {
+    name: string;
+    image?: string;
+  };
+}
 
 async function getPosts() {
   await connectDB();
@@ -17,7 +32,7 @@ async function getPosts() {
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
-  const posts = await getPosts();
+  const posts: PostType[] = await getPosts();
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -121,7 +136,7 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {posts.map((post: any) => (
+              {posts.map((post) => (
                 <Link
                   key={post._id}
                   href={`/blog/${post.slug}`}
@@ -130,10 +145,11 @@ export default async function HomePage() {
                   {/* Cover Image */}
                   {post.coverImage ? (
                     <div className="relative h-48 overflow-hidden bg-slate-900">
-                      <img 
+                      <Image 
                         src={post.coverImage} 
                         alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
                     </div>
@@ -159,11 +175,14 @@ export default async function HomePage() {
 
                     {/* Author & Date */}
                     <div className="flex items-center gap-3 pt-4 border-t border-slate-700/50">
-                      <img 
-                        src={post.author.image || '/default-avatar.jpg'} 
-                        alt={post.author.name}
-                        className="w-8 h-8 rounded-full ring-2 ring-purple-500/30"
-                      />
+                      <div className="relative w-8 h-8 shrink-0">
+                        <Image 
+                          src={post.author.image || '/default-avatar.jpg'} 
+                          alt={post.author.name}
+                          fill
+                          className="rounded-full ring-2 ring-purple-500/30 object-cover"
+                        />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-slate-300 truncate">
                           {post.author.name}
@@ -208,7 +227,7 @@ export default async function HomePage() {
               Ready to Share Your Story?
             </h2>
             <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
-              Join our community of writers and start publishing your ideas today. It's free and takes less than a minute!
+              Join our community of writers and start publishing your ideas today. It&apos;s free and takes less than a minute!
             </p>
             <Link
               href="/register"
@@ -222,9 +241,6 @@ export default async function HomePage() {
           </div>
         )}
       </div>
-
-      {/* Footer */}
-        
     </div>
   );
 }

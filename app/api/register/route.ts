@@ -81,11 +81,11 @@ export async function POST(request: Request) {
       { status: 201 }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Registration error:', error);
     
-
-    if (error.code === 11000) {
+    // Check for MongoDB duplicate key error
+    if (error && typeof error === 'object' && 'code' in error && error.code === 11000) {
       return NextResponse.json(
         { error: 'User with this email already exists' },
         { status: 400 }

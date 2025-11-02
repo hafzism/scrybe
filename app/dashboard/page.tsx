@@ -1,9 +1,20 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { authOptions } from '@/lib/auth';
+
+interface PostType {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  coverImage?: string;
+  createdAt: string;
+  views?: number;
+}
 
 async function getUserPosts(userId: string) {
   await connectDB();
@@ -21,7 +32,7 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  const posts = await getUserPosts(session.user.id);
+  const posts: PostType[] = await getUserPosts(session.user.id);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 py-12">
@@ -73,7 +84,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post: any) => (
+            {posts.map((post) => (
               <div 
                 key={post._id} 
                 className="group bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 overflow-hidden hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10"
@@ -81,10 +92,11 @@ export default async function DashboardPage() {
                 {/* Cover Image */}
                 {post.coverImage ? (
                   <div className="relative h-48 overflow-hidden bg-slate-900">
-                    <img 
+                    <Image 
                       src={post.coverImage} 
                       alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/20 to-transparent opacity-60"></div>
                   </div>

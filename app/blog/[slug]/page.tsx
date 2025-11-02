@@ -2,6 +2,7 @@ import connectDB from "@/lib/mongodb";
 import Post from "@/models/Post";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 async function getPost(slug: string) {
   await connectDB();
@@ -31,10 +32,12 @@ export default async function BlogPostPage({
       {/* Cover Image Hero */}
       {post.coverImage && (
         <div className="relative h-96 w-full overflow-hidden">
-          <img 
+          <Image 
             src={post.coverImage} 
             alt={post.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            priority
           />
           <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/80 to-slate-950/20"></div>
         </div>
@@ -58,11 +61,14 @@ export default async function BlogPostPage({
 
             {/* Author Card */}
             <div className="flex items-center gap-4 p-6 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50">
-              <img 
-                src={post.author.image || '/default-avatar.jpg'} 
-                alt={post.author.name}
-                className="w-16 h-16 rounded-full ring-4 ring-purple-500/30"
-              />
+              <div className="relative w-16 h-16 shrink-0">
+                <Image 
+                  src={post.author.image || '/default-avatar.jpg'} 
+                  alt={post.author.name}
+                  fill
+                  className="rounded-full ring-4 ring-purple-500/30 object-cover"
+                />
+              </div>
               <div className="flex-1">
                 <Link 
                   href={`/profile/${post.author._id}`}
@@ -145,11 +151,14 @@ export default async function BlogPostPage({
                 About the Author
               </h3>
               <div className="flex items-start gap-4">
-                <img 
-                  src={post.author.image || '/default-avatar.jpg'} 
-                  alt={post.author.name}
-                  className="w-20 h-20 rounded-full ring-4 ring-purple-500/30"
-                />
+                <div className="relative w-20 h-20 shrink-0">
+                  <Image 
+                    src={post.author.image || '/default-avatar.jpg'} 
+                    alt={post.author.name}
+                    fill
+                    className="rounded-full ring-4 ring-purple-500/30 object-cover"
+                  />
+                </div>
                 <div>
                   <Link 
                     href={`/profile/${post.author._id}`}

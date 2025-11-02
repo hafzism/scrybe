@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useUploadThing } from "@/lib/uploadthing";
+import Image from "next/image";
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -202,13 +203,14 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </label>
               </div>
             ) : (
-              <div className="relative rounded-xl overflow-hidden group ring-2 ring-purple-500/30">
-                <img
+              <div className="relative rounded-xl overflow-hidden group ring-2 ring-purple-500/30 h-64">
+                <Image
                   src={imagePreview}
                   alt="Preview"
-                  className="w-full h-64 object-cover"
+                  fill
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
                   <button
                     type="button"
                     onClick={removeImage}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { use } from 'react';
 import toast from 'react-hot-toast';
 import { useUploadThing } from '@/lib/uploadthing';
+import Image from 'next/image';
 
 export default function EditPostPage({ 
   params 
@@ -221,13 +222,14 @@ export default function EditPostPage({
                 </label>
               </div>
             ) : (
-              <div className="relative rounded-xl overflow-hidden group ring-2 ring-purple-500/30">
-                <img
+              <div className="relative rounded-xl overflow-hidden group ring-2 ring-purple-500/30 h-64">
+                <Image
                   src={imagePreview}
                   alt="Preview"
-                  className="w-full h-64 object-cover"
+                  fill
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center gap-3">
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center gap-3">
                   <label
                     htmlFor="cover-image"
                     className="opacity-0 group-hover:opacity-100 transition-opacity bg-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-600 shadow-lg cursor-pointer transform hover:scale-105"
@@ -280,7 +282,7 @@ export default function EditPostPage({
               className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none text-white placeholder-slate-500"
               placeholder="A brief summary..."
             />
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-xs text-slate-slate-500 mt-2">
               This will appear in previews and search results
             </p>
           </div>

@@ -48,7 +48,7 @@ function LoginForm() {
       router.push(callbackUrl);
       router.refresh();
 
-    } catch (err: any) {
+    } catch {
       setError('Something went wrong. Please try again.');
       setLoading(false);
     }
@@ -183,7 +183,7 @@ function LoginForm() {
           {/* Register Link */}
           <div className="text-center pt-6 border-t border-slate-700/50">
             <p className="text-sm text-slate-400">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link 
                 href="/register" 
                 className="font-semibold text-purple-400 hover:text-purple-300 transition-colors"

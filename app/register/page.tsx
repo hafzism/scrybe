@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { signIn } from 'next-auth/react';
 import { useUploadThing } from '@/lib/uploadthing';
 
@@ -108,16 +109,16 @@ export default function RegisterPage() {
           console.log("✅ Upload result:", uploadResult);
 
           if (uploadResult && uploadResult[0]) {
-            // Fixed: Use .url instead of .ufsUrl to match the working new post page
             profileImageUrl = uploadResult[0].url;
             console.log("🖼️ Image URL:", profileImageUrl);
             console.log("🔑 UFS URL:", uploadResult[0].ufsUrl);
           } else {
             throw new Error("Upload failed - no URL returned");
           }
-        } catch (uploadError: any) {
+        } catch (uploadError) {
+          const errorMessage = uploadError instanceof Error ? uploadError.message : 'Unknown error';
           console.error("❌ Upload error:", uploadError);
-          setError("Image upload failed: " + uploadError.message);
+          setError("Image upload failed: " + errorMessage);
           setLoading(false);
           setUploading(false);
           return;
@@ -167,9 +168,10 @@ export default function RegisterPage() {
       router.push('/');
       router.refresh();
 
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
       console.error("❌ Submit error:", err);
-      setError(err.message || 'Something went wrong');
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -190,7 +192,7 @@ export default function RegisterPage() {
               Create Account
             </h2>
             <p className="mt-2 text-sm text-slate-400">
-              Join us today! Let's get started ✨
+              Join us today! Let&apos;s get started ✨
             </p>
           </div>
 
@@ -245,11 +247,12 @@ export default function RegisterPage() {
                 </div>
               ) : (
                 <div className="flex justify-center">
-                  <div className="relative group">
-                    <img
+                  <div className="relative group w-32 h-32">
+                    <Image
                       src={imagePreview}
                       alt="Profile preview"
-                      className="w-32 h-32 rounded-full object-cover ring-4 ring-purple-500/30"
+                      fill
+                      className="rounded-full object-cover ring-4 ring-purple-500/30"
                     />
                     <div className="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
                       <button

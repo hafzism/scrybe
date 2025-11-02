@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { useUploadThing } from '@/lib/uploadthing';
 
@@ -9,8 +10,8 @@ interface ProfileClientProps {
   user: {
     _id: string;
     name: string;
-    image: string;
-    bio: string;
+    image?: string;
+    bio?: string;
   };
 }
 
@@ -19,12 +20,12 @@ export default function ProfileClient({ user }: ProfileClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: user.name,
-    image: user.image,
+    image: user.image || '/default-avatar.jpg',
   });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>(user.image);
+  const [imagePreview, setImagePreview] = useState<string>(user.image || '/default-avatar.jpg');
 
   const { startUpload } = useUploadThing("imageUploader");
 
@@ -83,16 +84,16 @@ export default function ProfileClient({ user }: ProfileClientProps) {
           console.log("✅ Upload result:", uploadResult);
 
           if (uploadResult && uploadResult[0]) {
-            // Fixed: Use .url instead of .ufsUrl
             profileImageUrl = uploadResult[0].url;
             console.log("🖼️ Image URL:", profileImageUrl);
             console.log("🔑 UFS URL:", uploadResult[0].ufsUrl);
           } else {
             throw new Error("Upload failed - no URL returned");
           }
-        } catch (uploadError: any) {
+        } catch (uploadError) {
+          const errorMessage = uploadError instanceof Error ? uploadError.message : 'Unknown error';
           console.error("❌ Upload error:", uploadError);
-          toast.error("Image upload failed: " + uploadError.message);
+          toast.error("Image upload failed: " + errorMessage);
           setLoading(false);
           setUploading(false);
           return;
@@ -124,9 +125,10 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       toast.success('Profile updated successfully! ✨');
       setIsModalOpen(false);
       router.refresh();
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error("❌ Submit error:", error);
-      toast.error(error.message);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -179,12 +181,15 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                 <div className="flex justify-center">
                   {imagePreview && imagePreview !== '/default-avatar.jpg' ? (
                     <div className="relative group">
-                      <img
-                        src={imagePreview}
-                        alt="Profile preview"
-                        className="w-32 h-32 rounded-full object-cover ring-4 ring-purple-500/30"
-                      />
-                      <div className="absolute inset-0 rounded-full bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
+                      <div className="relative w-32 h-32">
+                        <Image
+                          src={imagePreview}
+                          alt="Profile preview"
+                          fill
+                          className="rounded-full object-cover ring-4 ring-purple-500/30"
+                        />
+                      </div>
+                      <div className="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                           <input
                             type="file"

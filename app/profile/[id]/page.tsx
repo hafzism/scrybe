@@ -1,11 +1,31 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import Post from '@/models/Post';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import ProfileClient from '@/components/ProfileClient';
+
+interface UserType {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  bio?: string;
+  createdAt: string;
+}
+
+interface PostType {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  coverImage?: string;
+  createdAt: string;
+  views?: number;
+}
 
 async function getUserWithPosts(userId: string) {
   await connectDB();
@@ -36,7 +56,7 @@ export default async function ProfilePage({
     notFound();
   }
 
-  const { user, posts } = data;
+  const { user, posts }: { user: UserType; posts: PostType[] } = data;
   const isOwnProfile = session?.user?.id === id;
 
   return (
@@ -55,11 +75,14 @@ export default async function ProfilePage({
               {/* Profile Image */}
               <div className="relative group">
                 {user.image && user.image !== '/default-avatar.jpg' ? (
-                  <img
-                    src={user.image}
-                    alt={user.name}
-                    className="w-32 h-32 rounded-full object-cover ring-4 ring-slate-800 shadow-xl"
-                  />
+                  <div className="relative w-32 h-32">
+                    <Image
+                      src={user.image}
+                      alt={user.name}
+                      fill
+                      className="rounded-full object-cover ring-4 ring-slate-800 shadow-xl"
+                    />
+                  </div>
                 ) : (
                   <div className="w-32 h-32 rounded-full bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center text-5xl font-bold text-white shadow-xl ring-4 ring-slate-800">
                     {user.name.charAt(0).toUpperCase()}
@@ -133,7 +156,7 @@ export default async function ProfilePage({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {posts.map((post: any) => (
+              {posts.map((post) => (
                 <article 
                   key={post._id} 
                   className="group bg-slate-800/50 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden border border-slate-700/50 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10"
@@ -142,10 +165,11 @@ export default async function ProfilePage({
                   {post.coverImage ? (
                     <Link href={`/blog/${post.slug}`}>
                       <div className="relative h-48 overflow-hidden bg-slate-900">
-                        <img
+                        <Image
                           src={post.coverImage}
                           alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
                       </div>
