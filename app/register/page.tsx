@@ -254,7 +254,7 @@ export default function RegisterPage() {
                       fill
                       className="rounded-full object-cover ring-4 ring-purple-500/30"
                     />
-                    <div className="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full  bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
                       <button
                         type="button"
                         onClick={removeImage}

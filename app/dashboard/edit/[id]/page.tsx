@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
 import toast from 'react-hot-toast';
@@ -29,11 +29,7 @@ export default function EditPostPage({
 
   const { startUpload } = useUploadThing("imageUploader");
 
-  useEffect(() => {
-    fetchPost();
-  }, []);
-
-  const fetchPost = async () => {
+  const fetchPost = useCallback(async () => {
     try {
       const res = await fetch(`/api/posts/${id}`);
       const data = await res.json();
@@ -52,13 +48,17 @@ export default function EditPostPage({
       if (data.post.coverImage) {
         setImagePreview(data.post.coverImage);
       }
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to fetch post');
       router.push('/dashboard');
     } finally {
       setFetching(false);
     }
-  };
+  }, [id, router]);
+
+  useEffect(() => {
+    fetchPost();
+  }, [fetchPost]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -112,8 +112,8 @@ export default function EditPostPage({
 
       toast.success('Post updated successfully! ✨');
       router.push('/dashboard');
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update post');
     } finally {
       setLoading(false);
     }
@@ -132,10 +132,11 @@ export default function EditPostPage({
       }
       toast.success('Post deleted successfully!');
       router.push('/dashboard');
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete post');
     }
   };
+  
   if (fetching) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -229,7 +230,7 @@ export default function EditPostPage({
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center gap-3">
+                <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center gap-3">
                   <label
                     htmlFor="cover-image"
                     className="opacity-0 group-hover:opacity-100 transition-opacity bg-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-600 shadow-lg cursor-pointer transform hover:scale-105"

@@ -210,7 +210,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
+                <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-center justify-center">
                   <button
                     type="button"
                     onClick={removeImage}

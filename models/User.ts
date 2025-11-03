@@ -8,7 +8,6 @@ export interface IUser extends Document {
   image: string;
   role: string;
   bio: string;
-  
   createdAt: Date;
   updatedAt: Date;
 }
