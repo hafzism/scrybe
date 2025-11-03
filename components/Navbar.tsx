@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 export default function Navbar() {
   const { data: session } = useSession();
   return (
-    <nav className="bg-slate-900 border-b border-slate-800 shadow-lg">
+    <nav className="bg-slate-900 border-b border-slate-800 shadow-lg fixed top-0 left-0 right-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
