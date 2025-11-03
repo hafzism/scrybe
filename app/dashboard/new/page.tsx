@@ -84,9 +84,10 @@ const handleSubmit = async (e: React.FormEvent) => {
         } else {
           throw new Error("Upload failed - no URL returned");
         }
-      } catch (uploadError: any) {
+      } catch (uploadError: unknown) {
         console.error("❌ Upload error:", uploadError);
-        toast.error("Image upload failed: " + uploadError.message);
+        const errorMessage = uploadError instanceof Error ? uploadError.message : "Unknown upload error";
+        toast.error("Image upload failed: " + errorMessage);
         setLoading(false);
         setUploading(false);
         return; 
@@ -117,9 +118,10 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     toast.success("Post created successfully! 🎉");
     router.push("/dashboard");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("❌ Submit error:", error);
-    toast.error(error.message);
+    const errorMessage = error instanceof Error ? error.message : "An error occurred";
+    toast.error(errorMessage);
   } finally {
     setLoading(false);
   }
