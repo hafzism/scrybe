@@ -13,7 +13,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        await connectDB();
+        await connectDB(); 
         const user = await User.findOne({ email: credentials?.email });
         if (!user) throw new Error("No user found");
 
@@ -54,7 +54,6 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      // Runs whenever session is checked (client or server)
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;

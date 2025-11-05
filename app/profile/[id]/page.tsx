@@ -43,11 +43,16 @@ async function getUserWithPosts(userId: string) {
   };
 }
 
-export default async function ProfilePage({ 
+export default async function ProfilePage(
+
+  { 
   params 
 }: { 
   params: Promise<{ id: string }> 
-}) {
+}
+
+
+) {
   const { id } = await params;
   const data = await getUserWithPosts(id);
   const session = await getServerSession(authOptions);
@@ -62,17 +67,12 @@ export default async function ProfilePage({
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 py-12">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Profile Header */}
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-700/50 overflow-hidden mb-8">
-          {/* Cover Image / Banner */}
           <div className="h-48 bg-linear-to-r from-purple-500/20 via-blue-500/20 to-purple-500/20 relative">
             <div className="absolute inset-0 bg-linear-to-b from-transparent to-slate-800/50"></div>
           </div>
-
-          {/* Profile Content */}
           <div className="px-8 pb-8">
             <div className="flex items-start gap-6 flex-col sm:flex-row -mt-16 relative z-10">
-              {/* Profile Image */}
               <div className="relative group">
                 {user.image && user.image !== '/default-avatar.jpg' ? (
                   <div className="relative w-32 h-32">
@@ -112,20 +112,15 @@ export default async function ProfilePage({
                       </p>
                     )}
                   </div>
-                  
                   {isOwnProfile && (
                     <ProfileClient user={user} />
                   )}
                 </div>
-
-                {/* Stats */}
-
               </div>
             </div>
           </div>
         </div>
 
-        {/* Posts Section */}
         <div>
           <h2 className="text-2xl font-bold mb-6 text-white flex items-center gap-3">
             <svg className="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
