@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
 import Footer from "@/components/Footer";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Scrybe",
@@ -16,10 +13,19 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode;}) {
   return (
     <html lang="en">
+      <head>
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=Montaga&display=swap" rel="stylesheet" />
+
+      </head>
       <body>
         <Providers>
           <Navbar />
-          <main>{children}</main>
+          <main className="pt-16">
+            {children}
+          </main>
           <Toaster position="top-right" />
           <Footer />
         </Providers>

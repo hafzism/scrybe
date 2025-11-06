@@ -11,7 +11,7 @@ export async function GET(
   try {
     const { id } = await params;
     const session = await getServerSession(authOptions);
-
+    
     await connectDB();
 
     const post = await Post.findById(id);
